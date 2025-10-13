@@ -1,23 +1,20 @@
 import { afterNextRender, Component, effect, ElementRef, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterOutlet } from '@angular/router';
+import { VideoComponent } from './components/video/video.component';
+import { CanvasComponent } from './components/canvas/canvas.component';
 
 @Component({
   selector: 'app-root',
-  imports: [FormsModule],
+  imports: [FormsModule, VideoComponent, CanvasComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
 export class App {
   protected readonly title = signal('demo');
 
-  video = viewChild<ElementRef<HTMLVideoElement>>('video');
-  webcamVideo = viewChild<ElementRef<HTMLVideoElement>>('webcamVideo');
-  canvasElement = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
-  videoDevices = signal<MediaDeviceInfo[]>([]);
+  canvasComponent = viewChild<CanvasComponent>(CanvasComponent);
 
-  canvas?: HTMLCanvasElement;
-  ctx?: CanvasRenderingContext2D | null;
 
   recorder: MediaRecorder | null = null;
 
@@ -25,44 +22,16 @@ export class App {
 
   audioStream: MediaStream | null = null;
 
+
+  webcamvideoSrc = signal<MediaStream | undefined>(undefined);
+  screenVideoSrc = signal<MediaStream | undefined>(undefined);
+
   constructor() {
-    afterNextRender(() => {
-      console.log(this.canvasElement()?.nativeElement);
-      this.canvas = this.canvasElement()?.nativeElement;
-      this.ctx = this.canvas?.getContext('2d');
-    });
+    
 
-    this.getVideoDevices();
   }
 
-  startDrawing() {
-    const loop = () => {
-      this.draw();
-      requestAnimationFrame(loop);
-    };
-
-    requestAnimationFrame(loop);
-  }
-
-  draw() {
-    const videoEl = this.video()?.nativeElement;
-    const webcamEl = this.webcamVideo()?.nativeElement;
-    if (!this.ctx || !this.canvas || !videoEl || !webcamEl) {
-      return;
-    }
-    const { width, height } = this.canvas;
-
-    // clear out the entire canvas and paint from scratch
-    this.ctx.clearRect(0, 0, width, height);
-
-    // draw our screen share in top-left
-    // would need to do real math to get proper aspect ratio.
-    this.ctx.drawImage(videoEl, 0, 0, 500, 400);
-
-    // draw our webcam in bottom right.
-    // would need to do real math to get proper aspect ratio.
-    this.ctx.drawImage(webcamEl, width - 200, height - 100, 200, 100);
-  }
+  
 
   async getDesktopStream() {
     const screenShareStream = await navigator.mediaDevices.getDisplayMedia({
@@ -70,29 +39,15 @@ export class App {
       video: true,
     });
 
-    const videoElement = this.video()?.nativeElement;
-    if (videoElement) {
-      console.log(videoElement);
-      videoElement.srcObject = screenShareStream;
-    }
+    this.screenVideoSrc.set(screenShareStream); 
   }
 
-  async getVideoDevices() {
-    // 💡 first, ensure user's given permission to "enumerate" their video devices
+  async getWebcamDevices() {
     const webcamStream = await navigator.mediaDevices.getUserMedia({
       video: true,
       audio: false,
     });
-
-    const videoElement = this.webcamVideo()?.nativeElement;
-    if (videoElement) {
-      console.log(videoElement);
-      videoElement.srcObject = webcamStream;
-    }
-
-    // 💡 fetch all devices, and then filter for videoinput devices
-    const allDevices = await navigator.mediaDevices.enumerateDevices();
-    this.videoDevices.set(allDevices.filter((device) => device.kind === 'videoinput'));
+    this.webcamvideoSrc.set(webcamStream);
   }
 
   async getAudioStream() {
@@ -107,10 +62,12 @@ export class App {
   }
 
   startRecording() {
-    if (!this.ctx || !this.canvas) {
+
+    const canvasComponent = this.canvasComponent();
+    if (!canvasComponent || !canvasComponent.ctx || !canvasComponent.canvas) {
       return;
     }
-    const canvasStream = this.canvas.captureStream(30);
+    const canvasStream = canvasComponent.canvas.captureStream(30);
 
     // combine the canvas stream and mic stream (from above) by collecting
     //  tracks from each.

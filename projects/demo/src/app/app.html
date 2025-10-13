@@ -1,20 +1,32 @@
 <button (click)="getDesktopStream()">Capture Screen</button>
 <button (click)="getAudioStream()">Capture Audio</button>
+<button (click)="getWebcamDevices()">Capture Webcam</button>
 
-<button (click)="startDrawing()">Draw</button>
+<button (click)="canvasComponent.startDrawing()">Draw</button>
 
 <button (click)="startRecording()">Start Recording</button>
 <button (click)="stopRecording()">Stop Recording</button>
 
-<video autoplay #video width="640" height="480"></video>
+<app-canvas
+  #canvasComponent
+  [webcamVideoElement]="webcamVideo.video()?.nativeElement"
+  [screenVideoElement]="screenVideo.video()?.nativeElement"
+></app-canvas>
 
-<video autoplay #webcamVideo width="640" height="480"></video>
+<div>
+  <div>
+    <div
+      style="position: relative; background-color: #dedede; padding: 20px; display: inline-block"
+    >
+      <app-video #screenVideo [srcObject]="screenVideoSrc()"></app-video>
 
-<!-- <select>
-  <option *ngFor="let source of videoDevices()" [value]="source.id">{{ source.label }}</option>
-</select> -->
-
-
-<canvas style="background: #00ff00;" #canvas width="640" height="480"></canvas>
+      <app-video
+        style="position: absolute; top: 0; left: 0"
+        #webcamVideo
+        [srcObject]="webcamvideoSrc()"
+      ></app-video>
+    </div>
+  </div>
+</div>
 
 <a download="recording.webm" [href]="downloadData">Download recording</a>
