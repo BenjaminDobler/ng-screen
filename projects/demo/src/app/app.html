@@ -1,0 +1,20 @@
+<button (click)="getDesktopStream()">Capture Screen</button>
+<button (click)="getAudioStream()">Capture Audio</button>
+
+<button (click)="startDrawing()">Draw</button>
+
+<button (click)="startRecording()">Start Recording</button>
+<button (click)="stopRecording()">Stop Recording</button>
+
+<video autoplay #video width="640" height="480"></video>
+
+<video autoplay #webcamVideo width="640" height="480"></video>
+
+<!-- <select>
+  <option *ngFor="let source of videoDevices()" [value]="source.id">{{ source.label }}</option>
+</select> -->
+
+
+<canvas style="background: #00ff00;" #canvas width="640" height="480"></canvas>
+
+<a download="recording.webm" [href]="downloadData">Download recording</a>
