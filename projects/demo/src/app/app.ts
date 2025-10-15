@@ -1,20 +1,35 @@
-import { afterNextRender, Component, effect, ElementRef, signal, viewChild } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  effect,
+  ElementRef,
+  inject,
+  model,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterOutlet } from '@angular/router';
 import { VideoComponent } from './components/video/video.component';
 import { CanvasComponent } from './components/canvas/canvas.component';
+import { EditorComponent } from './components/editor/editor.component';
+import { Settings } from './service/settings';
+import { VideoDO } from './model/video';
 
 @Component({
   selector: 'app-root',
-  imports: [FormsModule, VideoComponent, CanvasComponent],
+  imports: [FormsModule, VideoComponent, CanvasComponent, EditorComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
 export class App {
   protected readonly title = signal('demo');
 
-  canvasComponent = viewChild<CanvasComponent>(CanvasComponent);
+  videos = signal<VideoDO[]>([]);
 
+  settings = inject(Settings);
+
+  canvasComponent = viewChild<CanvasComponent>(CanvasComponent);
 
   recorder: MediaRecorder | null = null;
 
@@ -23,23 +38,35 @@ export class App {
   audioStream: MediaStream | null = null;
 
 
-  webcamvideoSrc = signal<MediaStream | undefined>(undefined);
-  screenVideoSrc = signal<MediaStream | undefined>(undefined);
+  backgroundColor = model('#000000');
 
-  constructor() {
-    
+  // webcamvideoSrc = signal<MediaStream | undefined>(undefined);
+  // screenVideoSrc = signal<MediaStream | undefined>(undefined);
 
-  }
+  recordingWidth = model(1920);
+  recordingHeight = model(1080);
 
-  
+  constructor() {}
 
   async getDesktopStream() {
+    const video = new VideoDO();
+
     const screenShareStream = await navigator.mediaDevices.getDisplayMedia({
-      // we only want video for now, but can easily specify other options
       video: true,
     });
 
-    this.screenVideoSrc.set(screenShareStream); 
+    screenShareStream.getVideoTracks().forEach((track) => {
+      console.log(track.getSettings());
+      track.onended = () => {
+        console.log('track ended');
+        video.stream = undefined;
+      };
+    });
+
+    //this.screenVideoSrc.set(screenShareStream);
+
+    video.stream = screenShareStream;
+    this.videos.update((prev) => [...prev, video]);
   }
 
   async getWebcamDevices() {
@@ -47,7 +74,11 @@ export class App {
       video: true,
       audio: false,
     });
-    this.webcamvideoSrc.set(webcamStream);
+    // this.webcamvideoSrc.set(webcamStream);
+
+    const video = new VideoDO();
+    video.stream = webcamStream;
+    this.videos.update((prev) => [...prev, video]);
   }
 
   async getAudioStream() {
@@ -62,7 +93,6 @@ export class App {
   }
 
   startRecording() {
-
     const canvasComponent = this.canvasComponent();
     if (!canvasComponent || !canvasComponent.ctx || !canvasComponent.canvas) {
       return;
@@ -71,7 +101,10 @@ export class App {
 
     // combine the canvas stream and mic stream (from above) by collecting
     //  tracks from each.
-    const combinedStream = new MediaStream([...canvasStream.getTracks(), ...(this.audioStream?.getTracks() || [])]);
+    const combinedStream = new MediaStream([
+      ...canvasStream.getTracks(),
+      ...(this.audioStream?.getTracks() || []),
+    ]);
 
     const chunks: Blob[] = [];
 

@@ -6,27 +6,62 @@
 
 <button (click)="startRecording()">Start Recording</button>
 <button (click)="stopRecording()">Stop Recording</button>
+{{settings.scale()}}
+<div style="display: flex">
+  <app-editor
+    (scaleChange)="settings.scale.set($event)"
+    style="width: 100%; max-width: 900px;"
+      [background]="backgroundColor()"
 
-<app-canvas
-  #canvasComponent
-  [webcamVideoElement]="webcamVideo.video()?.nativeElement"
-  [screenVideoElement]="screenVideo.video()?.nativeElement"
-></app-canvas>
+    [contentWidth]="recordingWidth()"
+    [contentHeight]="recordingHeight()"
+  >
+    @for(video of videos(); track $index) {
+    <app-video
+      (selected)="settings.setSelectedVideo($event)"
+      [scale]="settings.scale()"
+      [width]="recordingWidth()"
+      #screenVideo
+      [srcObject]="video.stream"
+      [videoDO]="video"
+    ></app-video>
 
-<div>
-  <div>
-    <div
-      style="position: relative; background-color: #dedede; padding: 20px; display: inline-block"
-    >
-      <app-video #screenVideo [srcObject]="screenVideoSrc()"></app-video>
+    <!-- <app-video
+      (selected)="settings.setSelectedVideo($event)"
+      style="position: absolute; top: 0; left: 0"
+      #webcamVideo
+      [scale]="settings.scale()"
+      [srcObject]="webcamvideoSrc()"
+    ></app-video> -->
+    }
+  </app-editor>
+  <div style="width: 200px;">
+    @let selectedVideo = settings.selectedVideo(); Settings @if(selectedVideo) {
 
-      <app-video
-        style="position: absolute; top: 0; left: 0"
-        #webcamVideo
-        [srcObject]="webcamvideoSrc()"
-      ></app-video>
-    </div>
+    <select [(ngModel)]="selectedVideo.clipType">
+      <option>none</option>
+      <option>circle</option>
+      <option>rectangle</option>
+    </select>
+
+    <input type="checkbox" [(ngModel)]="selectedVideo.showClippedHint" /> Show clipped hint }
+    {{ backgroundColor() }}
+    <input type="color" [(ngModel)]="backgroundColor" /> Background color
   </div>
 </div>
+<app-editor
+  style="width: 100%"
+  [background]="backgroundColor()"
+  [contentWidth]="recordingWidth()"
+  [contentHeight]="recordingHeight()"
+>
+  <app-canvas
+    [background]="backgroundColor()"
+    [canvasHeight]="recordingHeight()"
+    [canvasWidth]="recordingWidth()"
+    #canvasComponent
+    [videos]="videos()"
+  ></app-canvas>
+</app-editor>
 
 <a download="recording.webm" [href]="downloadData">Download recording</a>

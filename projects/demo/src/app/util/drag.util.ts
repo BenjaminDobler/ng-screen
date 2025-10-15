@@ -3,7 +3,7 @@ import { fromEvent, race, last, map, share, startWith, switchMap, take, takeUnti
 const mouseMove$ = fromEvent<PointerEvent>(document, 'pointermove').pipe(share());
 const mouseUp$ = fromEvent<PointerEvent>(document, 'pointerup').pipe(share());
 
-export function makeDraggable(element: HTMLElement, disabled$ = new BehaviorSubject<boolean>(false)) {
+export function makeDraggable(element: Element, disabled$ = new BehaviorSubject<boolean>(false)) {
   const mouseDown$ =  fromEvent<PointerEvent>(element, 'pointerdown').pipe(
     filter((e: PointerEvent)=>{
       console.log(e.button)

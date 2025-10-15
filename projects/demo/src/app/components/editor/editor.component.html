@@ -1,0 +1,10 @@
+<div
+  #content
+  [style.backgroundColor]="background()"
+  class="content"
+  [style.transform]="`scale(${contentScale()})`"
+  [style.width.px]="contentWidth()"
+  [style.height.px]="contentHeight()"
+>
+  <ng-content></ng-content>
+</div>
