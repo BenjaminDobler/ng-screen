@@ -60,17 +60,16 @@
 
 <a download="recording.webm" [href]="downloadData">Download recording</a>
 
-
-
-@for(recording of recordings(); track $index) {
+@for (recording of recordings(); track $index) {
   <div>
     {{ recording.name }}
     <a download="{{ recording.name }}" [href]="getRecordingUrl(recording)">Download</a>
     <button (click)="playRecording(recording)">Play</button>
+    <button (click)="convertRecording(recording)">Convert</button>
   </div>
 }
 
-@if(currentVideo()) {
+@if (currentVideo()) {
   <h3>Playback</h3>
   <video #playbackVideo controls [src]="currentVideo()"></video>
 }

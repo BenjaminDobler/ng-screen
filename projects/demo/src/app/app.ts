@@ -15,6 +15,7 @@ import { CanvasComponent } from './components/canvas/canvas.component';
 import { EditorComponent } from './components/editor/editor.component';
 import { Settings } from './service/settings';
 import { Recording, VideoDO } from './model/video';
+import { VideoService } from './service/video.service';
 
 @Component({
   selector: 'app-root',
@@ -25,9 +26,12 @@ import { Recording, VideoDO } from './model/video';
 export class App {
   protected readonly title = signal('demo');
 
+  videoService = inject(VideoService);
+
   recordingCount = signal(0);
   recordings = signal<Recording[]>([]);
   currentVideo = signal<string | null>(null);
+
 
   videos = signal<VideoDO[]>([]);
 
@@ -186,5 +190,12 @@ export class App {
 
   stopRecording() {
     this.recorder?.stop();
+  }
+
+  async convertRecording(recording: Recording) {
+    await this.videoService.loadFFmpeg();
+    const data = await this.videoService.convert(recording.chunks);
+    console.log('conversion done!');
+    return data;
   }
 }
