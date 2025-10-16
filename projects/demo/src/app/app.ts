@@ -14,7 +14,7 @@ import { VideoComponent } from './components/video/video.component';
 import { CanvasComponent } from './components/canvas/canvas.component';
 import { EditorComponent } from './components/editor/editor.component';
 import { Settings } from './service/settings';
-import { VideoDO } from './model/video';
+import { Recording, VideoDO } from './model/video';
 
 @Component({
   selector: 'app-root',
@@ -24,6 +24,10 @@ import { VideoDO } from './model/video';
 })
 export class App {
   protected readonly title = signal('demo');
+
+  recordingCount = signal(0);
+  recordings = signal<Recording[]>([]);
+  currentVideo = signal<string | null>(null);
 
   videos = signal<VideoDO[]>([]);
 
@@ -93,6 +97,18 @@ export class App {
   }
 
   startRecording() {
+
+    const name = `recording-${this.recordingCount()}.webm`;
+    this.recordingCount.set(this.recordingCount() + 1);
+
+    const recording: Recording = {
+      chunks: [],
+      name,
+    };
+
+    this.recordings.update((prev) => [...prev, recording]);
+    
+
     const canvasComponent = this.canvasComponent();
     if (!canvasComponent || !canvasComponent.ctx || !canvasComponent.canvas) {
       return;
@@ -122,22 +138,31 @@ export class App {
 
     // when recorder stops (via recorder.stop()), handle blobs
     this.recorder.onstop = () => {
-      console.log('on stop');
-      const recordedBlob = new Blob(chunks, { type: chunks[0].type });
-      const data = URL.createObjectURL(recordedBlob);
-      this.downloadData = data;
-      console.log(this.downloadData);
 
-      const link = document.createElement('a');
-      link.href = data;
-      link.download = 'recording.webm';
-      link.dispatchEvent(new MouseEvent('click', { view: window }));
+      this.recordings.update((prev) => {
+        const lastRecording = prev[prev.length - 1];
+        if (lastRecording) {
+          lastRecording.chunks = chunks;
+        }
+        return [...prev];
+      });
 
-      // 💡 don't forget to clean up!
-      setTimeout(() => {
-        URL.revokeObjectURL(data);
-        link.remove();
-      }, 500);
+      // console.log('on stop');
+      // const recordedBlob = new Blob(chunks, { type: chunks[0].type });
+      // const data = URL.createObjectURL(recordedBlob);
+      // this.downloadData = data;
+      // console.log(this.downloadData);
+
+      // const link = document.createElement('a');
+      // link.href = data;
+      // link.download = 'recording.webm';
+      // link.dispatchEvent(new MouseEvent('click', { view: window }));
+
+      // // 💡 don't forget to clean up!
+      // setTimeout(() => {
+      //   URL.revokeObjectURL(data);
+      //   link.remove();
+      // }, 500);
 
       // do something with this blob...
     };
@@ -145,6 +170,19 @@ export class App {
     console.log('start recording');
     this.recorder.start();
   }
+
+
+  getRecordingUrl(recording: Recording) {
+    const recordedBlob = new Blob(recording.chunks, { type: recording.chunks[0].type });
+    const data = URL.createObjectURL(recordedBlob);
+    return data;
+  }
+
+  playRecording(recording: Recording) {
+    const url = this.getRecordingUrl(recording);
+    this.currentVideo.set(url);
+  }
+
 
   stopRecording() {
     this.recorder?.stop();

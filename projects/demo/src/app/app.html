@@ -6,51 +6,45 @@
 
 <button (click)="startRecording()">Start Recording</button>
 <button (click)="stopRecording()">Stop Recording</button>
-{{settings.scale()}}
+{{ settings.scale() }}
 <div style="display: flex">
   <app-editor
     (scaleChange)="settings.scale.set($event)"
-    style="width: 100%; max-width: 900px;"
-      [background]="backgroundColor()"
-
+    style="width: 100%; max-width: 900px"
+    [background]="backgroundColor()"
     [contentWidth]="recordingWidth()"
     [contentHeight]="recordingHeight()"
   >
-    @for(video of videos(); track $index) {
-    <app-video
-      (selected)="settings.setSelectedVideo($event)"
-      [scale]="settings.scale()"
-      [width]="recordingWidth()"
-      #screenVideo
-      [srcObject]="video.stream"
-      [videoDO]="video"
-    ></app-video>
-
-    <!-- <app-video
-      (selected)="settings.setSelectedVideo($event)"
-      style="position: absolute; top: 0; left: 0"
-      #webcamVideo
-      [scale]="settings.scale()"
-      [srcObject]="webcamvideoSrc()"
-    ></app-video> -->
+    @for (video of videos(); track $index) {
+      <app-video
+        (selected)="settings.setSelectedVideo($event)"
+        [scale]="settings.scale()"
+        [width]="recordingWidth()"
+        #screenVideo
+        [srcObject]="video.stream"
+        [videoDO]="video"
+      ></app-video>
     }
   </app-editor>
-  <div style="width: 200px;">
-    @let selectedVideo = settings.selectedVideo(); Settings @if(selectedVideo) {
-
-    <select [(ngModel)]="selectedVideo.clipType">
-      <option>none</option>
-      <option>circle</option>
-      <option>rectangle</option>
-    </select>
-
-    <input type="checkbox" [(ngModel)]="selectedVideo.showClippedHint" /> Show clipped hint }
+  <div style="width: 200px">
     {{ backgroundColor() }}
-    <input type="color" [(ngModel)]="backgroundColor" /> Background color
+    <input type="color" [(ngModel)]="backgroundColor" />
+
+    @let selectedVideo = settings.selectedVideo();
+
+    @if (selectedVideo) {
+      <select [(ngModel)]="selectedVideo.clipType">
+        <option>none</option>
+        <option>circle</option>
+        <option>rectangle</option>
+      </select>
+
+      <input type="checkbox" [(ngModel)]="selectedVideo.showClippedHint" /> Show clipped hint
+    }
   </div>
 </div>
 <app-editor
-  style="width: 100%"
+  style="width: 100%; display: none"
   [background]="backgroundColor()"
   [contentWidth]="recordingWidth()"
   [contentHeight]="recordingHeight()"
@@ -65,3 +59,18 @@
 </app-editor>
 
 <a download="recording.webm" [href]="downloadData">Download recording</a>
+
+
+
+@for(recording of recordings(); track $index) {
+  <div>
+    {{ recording.name }}
+    <a download="{{ recording.name }}" [href]="getRecordingUrl(recording)">Download</a>
+    <button (click)="playRecording(recording)">Play</button>
+  </div>
+}
+
+@if(currentVideo()) {
+  <h3>Playback</h3>
+  <video #playbackVideo controls [src]="currentVideo()"></video>
+}

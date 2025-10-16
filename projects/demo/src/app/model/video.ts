@@ -8,3 +8,9 @@ export class VideoDO {
     stream: MediaStream | undefined;
 
 }
+
+
+export interface Recording {
+    chunks: Blob[];
+    name: string;
+}
