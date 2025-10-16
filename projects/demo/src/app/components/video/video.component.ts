@@ -53,6 +53,10 @@ export class VideoComponent {
 
   scale = input<number>(1);
 
+  border = model<boolean>(true);
+  borderColor = model<string>('#ffffff');
+  borderWidth = model<number>(4);
+
   circleProps = model<{ cx: number; cy: number; r: number }>({ cx: 160, cy: 120, r: 120 });
   rectProps = model<{ x: number; y: number; width: number; height: number }>({
     x: 0,

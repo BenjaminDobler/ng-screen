@@ -1,21 +1,20 @@
-@if(showClippedHint()) {
-
-<video
-  style="position: absolute; left: 0; top: 0; opacity: 0.2"
-  [srcObject]="srcObject()"
-  [attr.width]="width()"
-  autoplay
-></video>
+@if (showClippedHint()) {
+  <video
+    style="position: absolute; left: 0; top: 0; opacity: 0.2"
+    [srcObject]="srcObject()"
+    [attr.width]="width()"
+    autoplay
+  ></video>
 }
 <video
   [style.clipPath]="
     clipType() === 'circle'
       ? 'circle(' + circleProps().r + 'px at ' + circleProps().cx + 'px ' + circleProps().cy + 'px)'
       : clipType() === 'rectangle'
-      ? `polygon(${rectProps().x}px ${rectProps().y}px, ${rectProps().x + rectProps().width}px ${rectProps().y}px, ${rectProps().x + rectProps().width}px ${
-          rectProps().y + rectProps().height
-        }px, ${rectProps().x}px ${rectProps().y + rectProps().height}px)`
-      : 'none'
+        ? `polygon(${rectProps().x}px ${rectProps().y}px, ${rectProps().x + rectProps().width}px ${rectProps().y}px, ${rectProps().x + rectProps().width}px ${
+            rectProps().y + rectProps().height
+          }px, ${rectProps().x}px ${rectProps().y + rectProps().height}px)`
+        : 'none'
   "
   [srcObject]="srcObject()"
   (loadedmetadata)="videoLoaded($event)"
@@ -26,32 +25,27 @@
 @let cp = circleProps();
 
 <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%">
-
-
-
-    <rect #rectangle
+  <rect
+    #rectangle
     [attr.x]="rectProps().x"
     [attr.y]="rectProps().y"
     [attr.width]="rectProps().width"
     [attr.height]="rectProps().height"
-    stroke="black"
-    stroke-width="5"
+    [attr.stroke]="borderColor()"
+    [attr.stroke-width]="borderWidth()"
     [style.visibility]="clipType() === 'rectangle' ? 'visible' : 'hidden'"
-    fill="rgba(255, 0, 0, 0.1)">
-
-    </rect>
-
-
+    fill="rgba(255, 0, 0, 0.1)"
+  ></rect>
 
   <circle
     #circle
     [attr.cx]="cp.cx"
     [attr.cy]="cp.cy"
     [attr.r]="cp.r"
-    stroke="black"
-    stroke-width="5"
+    [attr.stroke]="borderColor()"
+    [attr.stroke-width]="borderWidth()"
     [style.visibility]="clipType() === 'circle' ? 'visible' : 'hidden'"
-    fill="rgba(255, 0, 0, 0.1)"
+    fill="rgba(255, 0, 0, 0.001)"
   />
 
   <circle

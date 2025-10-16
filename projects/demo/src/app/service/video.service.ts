@@ -32,6 +32,45 @@ export class VideoService {
     };
   }
 
+
+  // "-ss $startTime -t $endTime -i $input -f segment -c copy $output"
+
+
+  async trimVideo(recordedBlobs: Blob[], startTime: number, endTime: number) {
+    if (!this.ffmpeg) {
+      console.error('ffmpeg not loaded');
+      return;
+    }
+
+    const blob = new Blob(recordedBlobs, { type: 'video/webm' });
+    const name = 'input.webm';
+    await this.ffmpeg.writeFile(name, await fetchFile(blob));
+
+    await this.ffmpeg.exec([
+      '-i',
+      name, // Input file
+        '-ss',
+      startTime.toString(),
+      '-t',
+      (endTime - startTime).toString(),
+      'trimmed.mp4', // Output file
+    ]);
+
+    console.log('conversion done');
+
+    const data = await this.ffmpeg.readFile('trimmed.mp4');
+    return data;
+
+    // const endTime = performance.now();
+    // const diffTime = ((endTime - startTime) / 1000).toFixed(2);
+    // this.conversionTime.next(` ${diffTime} s`);
+
+    // const data = (await this.ffmpeg.readFile('output.mp4')) as any;
+    // this.convertedVideoSrc.next(
+    //   URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' })),
+    // );
+  }
+
   async convert(recordedBlobs: Blob[]) {
     if (!this.ffmpeg) {
       console.error('ffmpeg not loaded');

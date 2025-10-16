@@ -66,13 +66,13 @@ export class CanvasComponent {
       const component = video.component;
       const element = component?.video()?.nativeElement;
       if (element) {
-        if (component?.clipType() === 'circle') {
+        if (component && component?.clipType() === 'circle') {
           this.ctx?.save();
           this.ctx?.beginPath();
           const { cx, cy, r } = component.circleProps();
           this.ctx?.arc(cx + component.x(), cy + component.y(), r, 0, Math.PI * 2, false);
-          this.ctx!.strokeStyle = '#2465D3';
-          this.ctx!.lineWidth = 10;
+          this.ctx!.strokeStyle = component.borderColor();
+          this.ctx!.lineWidth = component.borderWidth();
           this.ctx?.stroke();
           this.ctx?.clip();
           this.ctx?.drawImage(
@@ -117,8 +117,8 @@ export class CanvasComponent {
             y + component.y()
           );
           this.ctx?.closePath();
-          this.ctx!.strokeStyle = '#2465D3';
-          this.ctx!.lineWidth = 10;
+          this.ctx!.strokeStyle = component.borderColor();
+          this.ctx!.lineWidth = component.borderWidth();
           this.ctx?.stroke();
           this.ctx?.clip();
           this.ctx?.drawImage(

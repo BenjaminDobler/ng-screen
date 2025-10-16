@@ -102,7 +102,7 @@ export class App {
 
   startRecording() {
 
-    const name = `recording-${this.recordingCount()}.webm`;
+    const name = `recording-${this.recordingCount()}`;
     this.recordingCount.set(this.recordingCount() + 1);
 
     const recording: Recording = {
@@ -182,9 +182,24 @@ export class App {
     return data;
   }
 
+  getConvertedUrl(recording: Recording) {
+    if(recording.convertedData) {
+      const data = URL.createObjectURL(recording.convertedData);
+      return data;
+    }
+    return null;
+  }
+
   playRecording(recording: Recording) {
     const url = this.getRecordingUrl(recording);
     this.currentVideo.set(url);
+  }
+
+  playConvertedRecording(recording: Recording) {
+    if(recording.convertedData) {
+      const url = URL.createObjectURL(recording.convertedData);
+      this.currentVideo.set(url);
+    }
   }
 
 
@@ -195,7 +210,13 @@ export class App {
   async convertRecording(recording: Recording) {
     await this.videoService.loadFFmpeg();
     const data = await this.videoService.convert(recording.chunks);
+    if(data) {
+      const blob = new Blob([(data as any).buffer], { type: 'video/mp4' })
+      recording.convertedData = blob;
+    }
     console.log('conversion done!');
+
+    this.recordings.update((prev) => [...prev]);
     return data;
   }
 }

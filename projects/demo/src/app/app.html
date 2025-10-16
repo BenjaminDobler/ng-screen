@@ -10,7 +10,7 @@
 <div style="display: flex">
   <app-editor
     (scaleChange)="settings.scale.set($event)"
-    style="width: 100%; max-width: 900px"
+    style="width: 100%"
     [background]="backgroundColor()"
     [contentWidth]="recordingWidth()"
     [contentHeight]="recordingHeight()"
@@ -40,6 +40,9 @@
       </select>
 
       <input type="checkbox" [(ngModel)]="selectedVideo.showClippedHint" /> Show clipped hint
+
+      <input type="color" [(ngModel)]="selectedVideo.borderColor" /> Border Color
+      <input type="number" [(ngModel)]="selectedVideo.borderWidth" /> Border
     }
   </div>
 </div>
@@ -58,14 +61,24 @@
   ></app-canvas>
 </app-editor>
 
+
+<input type="number" [(ngModel)]="recordingWidth" /> x
+<input type="number" [(ngModel)]="recordingHeight" />
+{{settings.scale() * 100}}
+
+
 <a download="recording.webm" [href]="downloadData">Download recording</a>
 
 @for (recording of recordings(); track $index) {
   <div>
     {{ recording.name }}
-    <a download="{{ recording.name }}" [href]="getRecordingUrl(recording)">Download</a>
+    <a download="{{ recording.name }}.webm" [href]="getRecordingUrl(recording)">Download</a>
     <button (click)="playRecording(recording)">Play</button>
     <button (click)="convertRecording(recording)">Convert</button>
+    @if (recording.convertedData) {
+      <button (click)="playConvertedRecording(recording)">Play Converted</button>
+      <a download="{{ recording.name}}.mp4" [href]="getConvertedUrl(recording)">Download Converted</a>
+    }
   </div>
 }
 
