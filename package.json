@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration production --base-href=/ngx-screen/  ",
+    "build": "ng build --configuration production --base-href=/ng-screen/  ",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
