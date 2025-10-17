@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, model, signal } from '@angular/core';
 import { VideoComponent } from '../components/video/video.component';
 
 @Injectable({
@@ -9,6 +9,7 @@ export class Settings {
 
   recordingWidth = signal(1920);
   recordingHeight = signal(1080);
+  backgroundColor = signal('#000000');
 
   selectedVideo = signal<VideoComponent | null>(null);
 

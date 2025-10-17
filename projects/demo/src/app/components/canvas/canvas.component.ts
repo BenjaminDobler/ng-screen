@@ -1,5 +1,4 @@
 import { afterNextRender, Component, effect, ElementRef, input, viewChild } from '@angular/core';
-import { VideoComponent } from '../video/video.component';
 import { VideoDO } from '../../model/video';
 
 @Component({
@@ -21,9 +20,6 @@ export class CanvasComponent {
 
   background = input<string>('#000000');
 
-  // webcamVideoElement = input<VideoComponent | undefined>(undefined);
-  // screenVideoElement = input<VideoComponent | undefined>(undefined);
-
   constructor() {
     afterNextRender(() => {
       console.log(this.canvasElement()?.nativeElement);
@@ -37,26 +33,30 @@ export class CanvasComponent {
     });
   }
 
+  requestId: number | null = null;
+
+  stopDrawing() {
+    if (this.requestId) {
+      cancelAnimationFrame(this.requestId);
+      this.requestId = null;
+    }
+  }
+
   startDrawing() {
     const loop = () => {
       this.draw();
-      requestAnimationFrame(loop);
+      this.requestId = requestAnimationFrame(loop);
     };
 
-    requestAnimationFrame(loop);
+    this.requestId = requestAnimationFrame(loop);
   }
 
   draw() {
-    // const screen = this.screenVideoElement();
-    // const webcam = this.webcamVideoElement();
-    // const screenElement = screen?.video()?.nativeElement;
-    // const webcamElement = webcam?.video()?.nativeElement;
     if (!this.ctx || !this.canvas) {
       return;
     }
     const { width, height } = this.canvas;
 
-    // clear out the entire canvas and paint from scratch
     this.ctx.clearRect(0, 0, width, height);
 
     this.ctx.fillStyle = this.background();
@@ -80,7 +80,7 @@ export class CanvasComponent {
             component.x(),
             component.y(),
             component.width(),
-            component.height()
+            component.height(),
           );
           this.ctx?.restore();
         } else if (component?.clipType() === 'rectangle') {
@@ -93,28 +93,28 @@ export class CanvasComponent {
             x + component.x() + width,
             y + component.y(),
             x + component.x() + width,
-            y + component.y() + 20
+            y + component.y() + 20,
           );
           this.ctx?.lineTo(x + component.x() + width, y + component.y() + height - 20);
           this.ctx?.quadraticCurveTo(
             x + component.x() + width,
             y + component.y() + height,
             x + component.x() + width - 20,
-            y + component.y() + height
+            y + component.y() + height,
           );
           this.ctx?.lineTo(x + component.x() + 20, y + component.y() + height);
           this.ctx?.quadraticCurveTo(
             x + component.x(),
             y + component.y() + height,
             x + component.x(),
-            y + component.y() + height - 20
+            y + component.y() + height - 20,
           );
           this.ctx?.lineTo(x + component.x(), y + component.y() + 20);
           this.ctx?.quadraticCurveTo(
             x + component.x(),
             y + component.y(),
             x + component.x() + 20,
-            y + component.y()
+            y + component.y(),
           );
           this.ctx?.closePath();
           this.ctx!.strokeStyle = component.borderColor();
@@ -126,7 +126,7 @@ export class CanvasComponent {
             component.x(),
             component.y(),
             component.width(),
-            component.height()
+            component.height(),
           );
           this.ctx?.restore();
         } else {
@@ -135,44 +135,10 @@ export class CanvasComponent {
             component.x(),
             component.y(),
             component.width(),
-            component.height()
+            component.height(),
           );
         }
       }
     });
-
-    // this.ctx?.drawImage(screenElement, screen.x(), screen.y(), screen.width(), screen.height());
-
-    // if (webcam.clipType() === 'circle') {
-    //   this.ctx.save();
-    //   this.ctx.beginPath();
-    //   const { cx, cy, r } = webcam.circleProps();
-    //   this.ctx.arc(cx + webcam.x(), cy + webcam.y(), r, 0, Math.PI * 2, false);
-    //   this.ctx.strokeStyle = '#2465D3';
-    //   this.ctx.lineWidth = 10;
-    //   this.ctx.stroke();
-    //   this.ctx.clip();
-    //   this.ctx.drawImage(webcamElement, webcam.x(), webcam.y(), webcam.width(), webcam.height());
-    //   this.ctx.restore();
-    // } else {
-    //   this.ctx.drawImage(webcamElement, webcam.x(), webcam.y(), webcam.width(), webcam.height());
-    // }
-
-    // // draw our screen share in top-left
-    // // would need to do real math to get proper aspect ratio.
-
-    // this.ctx.save();
-    // this.ctx.beginPath();
-    // this.ctx.arc(150, 150, 130, 0, Math.PI * 2, false);
-    // this.ctx.strokeStyle = '#2465D3';
-    // this.ctx.lineWidth = 20;
-    // this.ctx.stroke();
-    // this.ctx.clip();
-    // this.ctx.drawImage(videoEl, 0, 0, 300, 300);
-    // this.ctx.restore();
-
-    // // draw our webcam in bottom right.
-    // // would need to do real math to get proper aspect ratio.
-    // this.ctx.drawImage(webcamEl, width - 200, height - 100, 200, 100);
   }
 }

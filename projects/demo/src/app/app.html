@@ -1,88 +1,47 @@
-<button (click)="getDesktopStream()">Capture Screen</button>
-<button (click)="getAudioStream()">Capture Audio</button>
-<button (click)="getWebcamDevices()">Capture Webcam</button>
-
-<button (click)="canvasComponent.startDrawing()">Draw</button>
-
-<button (click)="startRecording()">Start Recording</button>
-<button (click)="stopRecording()">Stop Recording</button>
-{{ settings.scale() }}
-<div style="display: flex">
-  <app-editor
-    (scaleChange)="settings.scale.set($event)"
-    style="width: 100%"
-    [background]="backgroundColor()"
-    [contentWidth]="recordingWidth()"
-    [contentHeight]="recordingHeight()"
-  >
-    @for (video of videos(); track $index) {
-      <app-video
-        (selected)="settings.setSelectedVideo($event)"
-        [scale]="settings.scale()"
-        [width]="recordingWidth()"
-        #screenVideo
-        [srcObject]="video.stream"
-        [videoDO]="video"
-      ></app-video>
-    }
-  </app-editor>
-  <div style="width: 200px">
-    {{ backgroundColor() }}
-    <input type="color" [(ngModel)]="backgroundColor" />
-
-    @let selectedVideo = settings.selectedVideo();
-
-    @if (selectedVideo) {
-      <select [(ngModel)]="selectedVideo.clipType">
-        <option>none</option>
-        <option>circle</option>
-        <option>rectangle</option>
-      </select>
-
-      <input type="checkbox" [(ngModel)]="selectedVideo.showClippedHint" /> Show clipped hint
-
-      <input type="color" [(ngModel)]="selectedVideo.borderColor" /> Border Color
-      <input type="number" [(ngModel)]="selectedVideo.borderWidth" /> Border
-    }
+<div style="display: flex; width: 100%; height: 100%; overflow: hidden">
+  <div style="display: flex; flex-direction: column; width: 100%; overflow: hidden; height: 100%">
+    <div style="padding: 40px; background: #222; overflow: hidden; flex: 1; display: flex; align-items: center; justify-content: center">
+      <app-editor
+        (scaleChange)="settings.scale.set($event)"
+        style="width: 100%"
+        [background]="settings.backgroundColor()"
+        [contentWidth]="settings.recordingWidth()"
+        [contentHeight]="settings.recordingHeight()"
+      >
+        @for (video of recordingService.videos(); track $index) {
+          <app-video
+            (selected)="settings.setSelectedVideo($event)"
+            [scale]="settings.scale()"
+            [width]="settings.recordingWidth()"
+            #screenVideo
+            [srcObject]="video.stream"
+            [videoDO]="video"
+          ></app-video>
+        }
+      </app-editor>
+    </div>
+    <app-controls></app-controls>
   </div>
+
+  <app-sidebar></app-sidebar>
 </div>
-<app-editor
-  style="width: 100%; display: none"
-  [background]="backgroundColor()"
-  [contentWidth]="recordingWidth()"
-  [contentHeight]="recordingHeight()"
->
-  <app-canvas
-    [background]="backgroundColor()"
-    [canvasHeight]="recordingHeight()"
-    [canvasWidth]="recordingWidth()"
-    #canvasComponent
-    [videos]="videos()"
-  ></app-canvas>
-</app-editor>
-
-
-<input type="number" [(ngModel)]="recordingWidth" /> x
-<input type="number" [(ngModel)]="recordingHeight" />
-{{settings.scale() * 100}}
-
-
-<a download="recording.webm" [href]="downloadData">Download recording</a>
-
-@for (recording of recordings(); track $index) {
-  <div>
-    {{ recording.name }}
-    <a download="{{ recording.name }}.webm" [href]="getRecordingUrl(recording)">Download</a>
-    <button (click)="playRecording(recording)">Play</button>
-    <button (click)="convertRecording(recording)">Convert</button>
-    @if (recording.convertedData) {
-      <button (click)="playConvertedRecording(recording)">Play Converted</button>
-      <a download="{{ recording.name}}.mp4" [href]="getConvertedUrl(recording)">Download Converted</a>
-    }
-  </div>
-}
 
 @if (currentVideo()) {
   <h3>Playback</h3>
   <video #playbackVideo controls [src]="currentVideo()"></video>
 }
+
+<app-editor
+  style="width: 100%; display: none"
+  [background]="settings.backgroundColor()"
+  [contentWidth]="settings.recordingWidth()"
+  [contentHeight]="settings.recordingHeight()"
+>
+  <app-canvas
+    [background]="settings.backgroundColor()"
+    [canvasHeight]="settings.recordingHeight()"
+    [canvasWidth]="settings.recordingWidth()"
+    #canvasComponent
+    [videos]="recordingService.videos()"
+  ></app-canvas>
+</app-editor>

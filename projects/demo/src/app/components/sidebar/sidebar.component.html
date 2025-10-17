@@ -1,0 +1,38 @@
+{{ settings.backgroundColor() }}
+<input type="color" [(ngModel)]="settings.backgroundColor" />
+
+<input type="number" [(ngModel)]="settings.recordingWidth" /> x
+<input type="number" [(ngModel)]="settings.recordingHeight" />
+{{ settings.scale() * 100 }}
+
+@let selectedVideo = settings.selectedVideo();
+
+@if (selectedVideo) {
+  <select [(ngModel)]="selectedVideo.clipType">
+    <option>none</option>
+    <option>circle</option>
+    <option>rectangle</option>
+  </select>
+
+  <input type="checkbox" [(ngModel)]="selectedVideo.showClippedHint" /> Show clipped hint
+
+  <input type="color" [(ngModel)]="selectedVideo.borderColor" /> Border Color
+  <input type="number" [(ngModel)]="selectedVideo.borderWidth" /> Border
+}
+
+<!-- <a download="recording.webm" [href]="downloadData">Download recording</a> -->
+
+@for (recording of recordingService.recordings(); track $index) {
+  <div>
+    {{ recording.name }}
+    <!-- <a download="{{ recording.name }}.webm" [href]="getRecordingUrl(recording)">Download</a>
+    <button (click)="playRecording(recording)">Play</button>
+    <button (click)="convertRecording(recording)">Convert</button>
+    @if (recording.convertedData) {
+      <button (click)="playConvertedRecording(recording)">Play Converted</button>
+      <a download="{{ recording.name }}.mp4" [href]="getConvertedUrl(recording)"
+        >Download Converted</a
+      >
+    } -->
+  </div>
+}
