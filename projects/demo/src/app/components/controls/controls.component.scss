@@ -21,6 +21,10 @@
   justify-content: center;
 
   background: linear-gradient(179.93deg, #303030 0.06%, #1e1e1e 99.94%);
+
+  &:hover {
+    background: linear-gradient(360deg, #303030 0.06%, #1e1e1e 99.94%);
+  }
 }
 
 .btn::before {
@@ -34,3 +38,45 @@
   z-index: -1;
   background: linear-gradient(202.15deg, #646361 -9.36%, #242424 58.02%);
 }
+
+.btn-small {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: linear-gradient(179.93deg, #303030 0.06%, #1e1e1e 99.94%);
+
+  &:before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: -1px;
+    bottom: -1px;
+    right: -1px;
+    border-radius: 10px;
+    z-index: -1;
+    background: linear-gradient(223deg, #646361 -9.36%, #242424 58.02%);
+    transition: all 0.3s;
+  }
+  &:hover {
+    &:before {
+      background: linear-gradient(43deg, #646361 -9.36%, #242424 58.02%);
+    }
+  }
+}
+
+// .btn-small::before {
+//   content: '';
+//   position: absolute;
+//   left: -1px;
+//   top: -1px;
+//   bottom: -1px;
+//   right: -1px;
+//   border-radius: 10px;
+//   z-index: -1;
+//   background: linear-gradient(223deg, #646361 -9.36%, #242424 58.02%);
+//   transition: all 0.3s;
+// }

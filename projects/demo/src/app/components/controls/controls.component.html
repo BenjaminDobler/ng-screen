@@ -7,42 +7,57 @@
         : recordingService.startRecording()
     "
   >
-    <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g filter="url(#filter0_i_2_5)">
-        <circle cx="9.5" cy="9.5" r="9.5" fill="#FE3030" />
-      </g>
-      <defs>
-        <filter
-          id="filter0_i_2_5"
-          x="0"
-          y="0"
-          width="19"
-          height="21"
-          filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
-        >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
-          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feColorMatrix
-            in="SourceAlpha"
-            type="matrix"
-            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-            result="hardAlpha"
-          />
-          <feOffset dy="2" />
-          <feGaussianBlur stdDeviation="1" />
-          <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
-          <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" />
-          <feBlend mode="normal" in2="shape" result="effect1_innerShadow_2_5" />
-        </filter>
-      </defs>
-    </svg>
+    @if (recordingService.isRecording()) {
+      <svg
+        width="21"
+        height="21"
+        viewBox="0 0 21 21"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect width="21" height="21" rx="5" fill="#D9D9D9" />
+      </svg>
+    } @else {
+      <svg
+        width="19"
+        height="19"
+        viewBox="0 0 19 19"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g filter="url(#filter0_i_2_5)">
+          <circle cx="9.5" cy="9.5" r="9.5" fill="#FE3030" />
+        </g>
+        <defs>
+          <filter
+            id="filter0_i_2_5"
+            x="0"
+            y="0"
+            width="19"
+            height="21"
+            filterUnits="userSpaceOnUse"
+            color-interpolation-filters="sRGB"
+          >
+            <feFlood flood-opacity="0" result="BackgroundImageFix" />
+            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+            <feColorMatrix
+              in="SourceAlpha"
+              type="matrix"
+              values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+              result="hardAlpha"
+            />
+            <feOffset dy="2" />
+            <feGaussianBlur stdDeviation="1" />
+            <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
+            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" />
+            <feBlend mode="normal" in2="shape" result="effect1_innerShadow_2_5" />
+          </filter>
+        </defs>
+      </svg>
+    }
   </div>
 
-  <div
-    style="padding: 6px; border: solid 1px #444; border-radius: 10px"
-    (click)="recordingService.getWebcamDevices()"
-  >
+  <div class="btn-small" (click)="recordingService.getWebcamDevices()">
     <svg
       width="24px"
       height="24px"
@@ -61,10 +76,7 @@
     </svg>
   </div>
 
-  <div
-    style="padding: 6px; border: solid 1px #444; border-radius: 10px"
-    (click)="recordingService.getDesktopStream()"
-  >
+  <div class="btn-small" (click)="recordingService.getDesktopStream()">
     <svg
       width="24px"
       height="24px"
@@ -82,10 +94,7 @@
     </svg>
   </div>
 
-  <div
-    style="padding: 6px; border: solid 1px #444; border-radius: 10px"
-    (click)="recordingService.getAudioStream()"
-  >
+  <div class="btn-small" (click)="recordingService.getAudioStream()">
     <svg
       width="24px"
       height="24px"
@@ -102,5 +111,4 @@
       />
     </svg>
   </div>
-
 </div>

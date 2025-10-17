@@ -7,7 +7,7 @@ import { VideoService } from './video.service';
 export class RecordingService {
   videoService = inject(VideoService);
   recorder: MediaRecorder | null = null;
-  recordingCount = signal(0);
+  recordingCount = signal(1);
   isRecording = signal(false);
   recordings = signal<Recording[]>([]);
   videos = signal<VideoDO[]>([]);
