@@ -1,21 +1,24 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Recording, VideoDO } from '../model/video';
 import { CanvasComponent } from '../components/canvas/canvas.component';
+import { VideoService } from './video.service';
 
 @Injectable({ providedIn: 'root' })
 export class RecordingService {
+  videoService = inject(VideoService);
   recorder: MediaRecorder | null = null;
   recordingCount = signal(0);
   isRecording = signal(false);
   recordings = signal<Recording[]>([]);
   videos = signal<VideoDO[]>([]);
   audioStream: MediaStream | null = null;
-  canvasComponent: CanvasComponent | null = null;
-
+  canvasComponent: CanvasComponent | undefined = undefined;
+  videoCount = 0;
   constructor() {}
 
   async getDesktopStream() {
     const video = new VideoDO();
+    video.id = `video-${this.videoCount++}`;
 
     const screenShareStream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
@@ -38,6 +41,7 @@ export class RecordingService {
       audio: false,
     });
     const video = new VideoDO();
+    video.id = `video-${this.videoCount++}`;
     video.stream = webcamStream;
     this.videos.update((prev) => [...prev, video]);
   }
@@ -54,21 +58,22 @@ export class RecordingService {
   }
 
   startRecording() {
+    console.log('startRecording called', this.canvasComponent);
     this.isRecording.set(true);
     if (this.canvasComponent) {
+      console.log('start drawing');
       this.canvasComponent.startDrawing();
     }
     const name = `recording-${this.recordingCount()}`;
     this.recordingCount.set(this.recordingCount() + 1);
 
-    const recording: Recording = {
-      chunks: [],
-      name,
-    };
+    const recording = new Recording(this.videoService);
+    recording.name = name;
 
     this.recordings.update((prev) => [...prev, recording]);
 
     if (!this.canvasComponent || !this.canvasComponent.ctx || !this.canvasComponent.canvas) {
+      console.log('no canvas component');
       return;
     }
     const canvasStream = this.canvasComponent.canvas.captureStream(30);
@@ -85,6 +90,7 @@ export class RecordingService {
     });
 
     this.recorder.ondataavailable = (evt) => {
+      console.log('data available', evt.data);
       chunks.push(evt.data);
     };
 
@@ -109,5 +115,19 @@ export class RecordingService {
 
   stopRecording() {
     this.recorder?.stop();
+  }
+
+  bringToFront(video: VideoDO) {
+    const otherVids = this.videos().filter((v) => v !== video);
+    this.videos.set([...otherVids, video]);
+    return [...otherVids];
+    // this.videos.update((prev) => {
+    //   const index = prev.indexOf(video);
+    //   if (index > -1) {
+    //     prev.splice(index, 1);
+    //     prev.push(video);
+    //   }
+    //   return [...prev];
+    // });
   }
 }

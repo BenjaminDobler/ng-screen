@@ -12,6 +12,10 @@ export class VideoService {
 
   async loadFFmpeg() {
     this.ffmpeg = new FFmpeg();
+    this.ffmpeg.on('progress', (e) => {
+      console.log(`ffmpeg progress`, e.progress);
+      
+    });
     this.ffmpeg.on('log', ({ message }) => {
       console.log('ffmpeg message', message);
     });

@@ -8,7 +8,7 @@
         [contentWidth]="settings.recordingWidth()"
         [contentHeight]="settings.recordingHeight()"
       >
-        @for (video of recordingService.videos(); track $index) {
+        @for (video of recordingService.videos(); track video.id) {
           <app-video
             (selected)="settings.setSelectedVideo($event)"
             [scale]="settings.scale()"

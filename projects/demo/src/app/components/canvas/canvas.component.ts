@@ -21,8 +21,13 @@ export class CanvasComponent {
   background = input<string>('#000000');
 
   constructor() {
+    effect(() => {
+      const c = this.canvasElement();
+      console.log('canvas element changed', c);
+    });
     afterNextRender(() => {
       console.log(this.canvasElement()?.nativeElement);
+      console.log('canvas component initialized', this.canvasElement());
       this.canvas = this.canvasElement()?.nativeElement;
       this.ctx = this.canvas?.getContext('2d');
     });
@@ -43,6 +48,9 @@ export class CanvasComponent {
   }
 
   startDrawing() {
+    this.canvas = this.canvasElement()?.nativeElement;
+    this.ctx = this.canvas?.getContext('2d');
+    console.log('ctx  on stopDrawing', this.ctx);
     const loop = () => {
       this.draw();
       this.requestId = requestAnimationFrame(loop);
@@ -63,6 +71,7 @@ export class CanvasComponent {
     this.ctx.fillRect(0, 0, width, height);
 
     this.videos().forEach((video) => {
+      console.log('drawing video', video);
       const component = video.component;
       const element = component?.video()?.nativeElement;
       if (element) {

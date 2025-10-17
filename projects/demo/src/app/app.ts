@@ -40,7 +40,7 @@ export class App {
 
   settings = inject(Settings);
 
-  // canvasComponent = viewChild<CanvasComponent>(CanvasComponent);
+  canvasComponent = viewChild<CanvasComponent>(CanvasComponent);
 
   // recorder: MediaRecorder | null = null;
 
@@ -51,7 +51,13 @@ export class App {
 
   // isRecording = signal(false);
 
-  constructor() {}
+  constructor() {
+
+    afterNextRender(()=>{
+      console.log('canvas component', this.canvasComponent());  
+      this.recordingService.canvasComponent = this.canvasComponent();
+    })
+  }
 
   // async getDesktopStream() {
   //   const video = new VideoDO();
@@ -179,46 +185,34 @@ export class App {
   //   this.recorder.start();
   // }
 
-  getRecordingUrl(recording: Recording) {
-    const recordedBlob = new Blob(recording.chunks, { type: recording.chunks[0].type });
-    const data = URL.createObjectURL(recordedBlob);
-    return data;
-  }
+  
 
-  getConvertedUrl(recording: Recording) {
-    if (recording.convertedData) {
-      const data = URL.createObjectURL(recording.convertedData);
-      return data;
-    }
-    return null;
-  }
+  // playRecording(recording: Recording) {
+  //   // const url = this.getRecordingUrl(recording);
+  //   // this.currentVideo.set(url);
+  // }
 
-  playRecording(recording: Recording) {
-    const url = this.getRecordingUrl(recording);
-    this.currentVideo.set(url);
-  }
-
-  playConvertedRecording(recording: Recording) {
-    if (recording.convertedData) {
-      const url = URL.createObjectURL(recording.convertedData);
-      this.currentVideo.set(url);
-    }
-  }
+  // playConvertedRecording(recording: Recording) {
+  //   if (recording.convertedData) {
+  //     const url = URL.createObjectURL(recording.convertedData);
+  //     this.currentVideo.set(url);
+  //   }
+  // }
 
   // stopRecording() {
   //   this.recorder?.stop();
   // }
 
-  async convertRecording(recording: Recording) {
-    await this.videoService.loadFFmpeg();
-    const data = await this.videoService.convert(recording.chunks);
-    if (data) {
-      const blob = new Blob([(data as any).buffer], { type: 'video/mp4' });
-      recording.convertedData = blob;
-    }
-    console.log('conversion done!');
+  // async convertRecording(recording: Recording) {
+  //   await this.videoService.loadFFmpeg();
+  //   const data = await this.videoService.convert(recording.chunks);
+  //   if (data) {
+  //     const blob = new Blob([(data as any).buffer], { type: 'video/mp4' });
+  //     recording.convertedData = blob;
+  //   }
+  //   console.log('conversion done!');
 
-    this.recordingService.recordings.update((prev) => [...prev]);
-    return data;
-  }
+  //   this.recordingService.recordings.update((prev) => [...prev]);
+  //   return data;
+  // }
 }

@@ -18,6 +18,7 @@
 
   <input type="color" [(ngModel)]="selectedVideo.borderColor" /> Border Color
   <input type="number" [(ngModel)]="selectedVideo.borderWidth" /> Border
+  <button (click)="recordingService.bringToFront(selectedVideo.videoDO())">Bring to Front</button>
 }
 
 <!-- <a download="recording.webm" [href]="downloadData">Download recording</a> -->
@@ -25,8 +26,13 @@
 @for (recording of recordingService.recordings(); track $index) {
   <div>
     {{ recording.name }}
-    <!-- <a download="{{ recording.name }}.webm" [href]="getRecordingUrl(recording)">Download</a>
-    <button (click)="playRecording(recording)">Play</button>
+
+    <button (click)="recording.convertRecording()">Convert</button>
+
+    <button (click)="recording.download()">Download</button>
+    <button (click)="editorService.open(recording)">Edit</button>
+
+    <!-- <button (click)="playRecording(recording)">Play</button>
     <button (click)="convertRecording(recording)">Convert</button>
     @if (recording.convertedData) {
       <button (click)="playConvertedRecording(recording)">Play Converted</button>

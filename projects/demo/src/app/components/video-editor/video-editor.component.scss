@@ -1,0 +1,33 @@
+:host {
+  display: block;
+  background: #222;
+  width: 100%;
+  height: 100%;
+}
+
+
+video {
+  width: 100%;
+  height: auto;
+}
+
+.timeline {
+  position: relative;
+  height: 50px;
+  background: #333;
+  margin-top: 10px;
+}
+.thumb {
+  position: absolute;
+  top: 0;
+  width: 10px;
+  height: 100%;
+  background: #666;
+  cursor: ew-resize;
+}
+.thumb.start {
+  left: 0;
+}
+.thumb.end {
+  right: 0;
+}
