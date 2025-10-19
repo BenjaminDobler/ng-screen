@@ -1,25 +1,42 @@
-{{ settings.backgroundColor() }}
-<input type="color" [(ngModel)]="settings.backgroundColor" />
+<div class="properties-panel">
+  <div class="properties-panel_header">
+    <h2>Canvas</h2>
+  </div>
+  <div class="properties-panel_row">
+    <input-component prefix="W" [(ngModel)]="settings.recordingWidth"></input-component>
+    <input-component prefix="H" [(ngModel)]="settings.recordingHeight"></input-component>
+  </div>
+  <div class="properties-panel_row">
+    <color [(ngModel)]="settings.backgroundColor"></color>
+  </div>
 
-<input type="number" [(ngModel)]="settings.recordingWidth" /> x
-<input type="number" [(ngModel)]="settings.recordingHeight" />
-{{ settings.scale() * 100 }}
+  @let selectedVideo = settings.selectedVideo();
 
-@let selectedVideo = settings.selectedVideo();
+  @if (selectedVideo) {
+    <div class="properties-panel_row">
+      <ed-select [(ngModel)]="selectedVideo.clipType">
+        <ed-select-option value="none">None</ed-select-option>
+        <ed-select-option value="circle">Circle</ed-select-option>
+        <ed-select-option value="rectangle">Rectangle</ed-select-option>
+      </ed-select>
+    </div>
 
-@if (selectedVideo) {
-  <select [(ngModel)]="selectedVideo.clipType">
-    <option>none</option>
-    <option>circle</option>
-    <option>rectangle</option>
-  </select>
+    <div class="properties-panel_header">
+      <h2>Border</h2>
+    </div>
+    <div class="properties-panel_row">
+      <color [(ngModel)]="selectedVideo.borderColor" />
+      <input-component type="number" [(ngModel)]="selectedVideo.borderWidth"></input-component>
+    </div>
 
-  <input type="checkbox" [(ngModel)]="selectedVideo.showClippedHint" /> Show clipped hint
-
-  <input type="color" [(ngModel)]="selectedVideo.borderColor" /> Border Color
-  <input type="number" [(ngModel)]="selectedVideo.borderWidth" /> Border
-  <button (click)="recordingService.bringToFront(selectedVideo.videoDO())">Bring to Front</button>
-}
+    <div class="properties-panel_row">
+      <button (click)="recordingService.bringToFront(selectedVideo.videoDO())">
+        Bring to Front
+      </button>
+    </div>
+    <input type="checkbox" [(ngModel)]="selectedVideo.showClippedHint" />
+  }
+</div>
 
 <!-- <a download="recording.webm" [href]="downloadData">Download recording</a> -->
 

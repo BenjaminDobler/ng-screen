@@ -31,6 +31,8 @@
     "@angular/router": "^20.3.0",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
+    "@richapps/ngx-drag": "^0.0.1",
+    "@richapps/ui-components": "^0.0.2",
     "prettier": "^3.6.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
