@@ -3,17 +3,23 @@
     <h2>Canvas</h2>
   </div>
   <div class="properties-panel_row">
+    <label>Size</label>
     <input-component prefix="W" [(ngModel)]="settings.recordingWidth"></input-component>
     <input-component prefix="H" [(ngModel)]="settings.recordingHeight"></input-component>
   </div>
   <div class="properties-panel_row">
+    <label>BG Color</label>
     <color [(ngModel)]="settings.backgroundColor"></color>
   </div>
 
   @let selectedVideo = settings.selectedVideo();
 
   @if (selectedVideo) {
+    <div class="properties-panel_header">
+      <h2>Clipping</h2>
+    </div>
     <div class="properties-panel_row">
+      <label>Type</label>
       <ed-select [(ngModel)]="selectedVideo.clipType">
         <ed-select-option value="none">None</ed-select-option>
         <ed-select-option value="circle">Circle</ed-select-option>
@@ -21,37 +27,58 @@
       </ed-select>
     </div>
 
+    @if (selectedVideo.clipType() !== 'none') {
+      <div class="properties-panel_row">
+        <label>Border</label>
+        <color [(ngModel)]="selectedVideo.borderColor" />
+        <input-component type="number" [(ngModel)]="selectedVideo.borderWidth"></input-component>
+      </div>
+    }
+
     <div class="properties-panel_header">
-      <h2>Border</h2>
+      <h2>Background</h2>
     </div>
     <div class="properties-panel_row">
-      <color [(ngModel)]="selectedVideo.borderColor" />
-      <input-component type="number" [(ngModel)]="selectedVideo.borderWidth"></input-component>
+      <label>Type</label>
+
+      <ed-select [(ngModel)]="selectedVideo.videoDO().backgroundType">
+        <ed-select-option value="none">None</ed-select-option>
+        <ed-select-option value="blur">Blur</ed-select-option>
+        <ed-select-option value="image">Image</ed-select-option>
+      </ed-select>
     </div>
 
+    @if (selectedVideo.videoDO().backgroundType() === 'blur') {
+      <div class="properties-panel_row">
+        <label>Blur</label>
+        <input type="range" [min]="0" max="50" [(ngModel)]="selectedVideo.videoDO().blurAmount" />
+      </div>
+      <div class="properties-panel_row">
+        <label>Edge Blur</label>
+        <input
+          type="range"
+          [min]="0"
+          max="50"
+          [(ngModel)]="selectedVideo.videoDO().edgeBlurAmount"
+        />
+      </div>
+      <div class="properties-panel_row">
+        <label>FG. Thr.</label>
+        <input
+          type="range"
+          [min]="0"
+          max="1"
+          step="0.01"
+          [(ngModel)]="selectedVideo.videoDO().foregroundThreshold"
+        />
+      </div>
+    }
     <div class="properties-panel_row">
       <button (click)="recordingService.bringToFront(selectedVideo.videoDO())">
         Bring to Front
       </button>
     </div>
-
-    <ed-select [(ngModel)]="selectedVideo.videoDO().backgroundType">
-      <ed-select-option value="none">None</ed-select-option>
-      <ed-select-option value="blur">Blur</ed-select-option>
-      <ed-select-option value="image">Image</ed-select-option>
-    </ed-select>
-
     <input type="checkbox" [(ngModel)]="selectedVideo.showClippedHint" />
-    <input type="range" [min]="0" max="50" [(ngModel)]="selectedVideo.videoDO().blurAmount" />
-    <input type="range" [min]="0" max="50" [(ngModel)]="selectedVideo.videoDO().edgeBlurAmount" />
-    <input
-      type="range"
-      [min]="0"
-      max="1"
-      step="0.01"
-      [(ngModel)]="selectedVideo.videoDO().foregroundThreshold"
-    />
-    Muted
   }
 </div>
 
