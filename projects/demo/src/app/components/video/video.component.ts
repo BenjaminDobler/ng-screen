@@ -81,11 +81,6 @@ export class VideoComponent {
 
   constructor() {
     effect(() => {
-      const src = this.srcObject();
-      console.log('src changed', src);
-    });
-
-    effect(() => {
       const videoDO = this.videoDO();
       if (videoDO) {
         videoDO.component = this;
@@ -94,7 +89,6 @@ export class VideoComponent {
 
     effect(() => {
       const backgroundType = this.videoDO().backgroundType();
-      console.log('backgroundType changed', backgroundType);
       if (backgroundType === 'none') {
         this.stopBackgroundEffect();
       } else {
@@ -103,7 +97,6 @@ export class VideoComponent {
     });
 
     afterNextRender(() => {
-      console.log(this.video()?.nativeElement);
       this.addDragNDrop();
       this.addDragNDropCircle();
       this.addCircleHandleDnD();
@@ -135,7 +128,6 @@ export class VideoComponent {
     });
 
     dragMove$.subscribe((pos) => {
-      console.log(pos);
       const x = pos.deltaX / this.scale();
       const y = pos.deltaY / this.scale();
 
@@ -149,8 +141,6 @@ export class VideoComponent {
       //this.el.nativeElement.style.left = `${x}px`;
       //this.el.nativeElement.style.top = `${y}px`;
 
-      console.log(circleX);
-
       //
       //circle.style.transform = `translate(${circleX}px, ${circleY}px)`;
       //this.el.nativeElement.style.transform = `translate(${pos.deltaX}px, ${pos.deltaY}px)`;
@@ -158,7 +148,6 @@ export class VideoComponent {
   }
 
   addDragNDropRect() {
-    console.log('add drag n drop rectangle');
     const rectangle = this.rectangle()?.nativeElement;
     if (!rectangle) {
       return;
@@ -181,52 +170,31 @@ export class VideoComponent {
     });
 
     dragMove$.subscribe((pos) => {
-      console.log(pos.startOffsetX, this.rectProps().width);
       const x = pos.deltaX / this.scale();
       const y = pos.deltaY / this.scale();
 
       rectX = startX + x;
       rectY = startY + y;
 
-      console.log('start offset', pos.startOffsetX, pos.startOffsetY);
-
       if (pos.startOffsetX < 10) {
         // left resize
-        console.log('left resize');
       } else if (pos.startOffsetX / this.scale() > rect.width - 50) {
         // right resize
-        console.log('right resize');
 
         const x = pos.originalEvent.x / this.scale();
         const w = x - rect.x;
 
         //let width = pos.originalEvent.x - rect.left + rect.width - pos.startOffsetX;
-        console.log('new width', w);
         this.rectProps.update((props) => ({ ...props, width: Math.round(w) }));
       } else if (pos.startOffsetY < 10) {
         // top resize
-        console.log('top resize');
       } else if (pos.startOffsetY > this.rectProps().height - 10) {
         // bottom resize
-        console.log('bottom resize');
       } else {
         // move
-        console.log('move');
 
         this.rectProps.update((props) => ({ ...props, x: rectX, y: rectY }));
       }
-
-      //this.x.set(startX + x);
-      //this.y.set(startY + y);
-      //this.el.nativeElement.style.left = `${x}px`;
-      //this.el.nativeElement.style.top = `${y}px`;
-
-      // this.mask()?.nativeElement.setAttribute('cx', `${circleX}`);
-      // this.mask()?.nativeElement.setAttribute('cy', `${circleY}`);
-      // this.mask()?.nativeElement.setAttribute('r', `${this.circleProps().r}`);
-      //
-      //circle.style.transform = `translate(${circleX}px, ${circleY}px)`;
-      //this.el.nativeElement.style.transform = `translate(${pos.deltaX}px, ${pos.deltaY}px)`;
     });
   }
 
@@ -249,25 +217,17 @@ export class VideoComponent {
     });
 
     dragMove$.subscribe((pos) => {
-      console.log(pos);
       const x = pos.deltaX / this.scale();
       const y = pos.deltaY / this.scale();
 
       circleX = startX + x;
       circleY = startY + y;
-      //this.x.set(startX + x);
-      //this.y.set(startY + y);
-      //this.el.nativeElement.style.left = `${x}px`;
-      //this.el.nativeElement.style.top = `${y}px`;
 
       this.circleProps.update((props) => ({ ...props, cx: circleX, cy: circleY }));
 
       this.mask()?.nativeElement.setAttribute('cx', `${circleX}`);
       this.mask()?.nativeElement.setAttribute('cy', `${circleY}`);
       this.mask()?.nativeElement.setAttribute('r', `${this.circleProps().r}`);
-      //
-      //circle.style.transform = `translate(${circleX}px, ${circleY}px)`;
-      //this.el.nativeElement.style.transform = `translate(${pos.deltaX}px, ${pos.deltaY}px)`;
     });
   }
 
@@ -319,13 +279,6 @@ export class VideoComponent {
         this.y.set(startY + y);
         this.el.nativeElement.style.transform = `translate(${startX + x}px, ${startY + y}px)`;
       }
-
-      // check if right resize drag
-
-      //this.el.nativeElement.style.left = `${x}px`;
-      //this.el.nativeElement.style.top = `${y}px`;
-
-      //this.el.nativeElement.style.transform = `translate(${pos.deltaX}px, ${pos.deltaY}px)`;
     });
   }
 
@@ -338,16 +291,6 @@ export class VideoComponent {
           const height = contentBoxSize.blockSize;
           // this.width.set(Math.round(width));
           this.height.set(Math.round(height));
-
-          // const h1Elem = this.el.nativeElement.querySelector('h1');
-          // const pElem = this.el.nativeElement.querySelector('p');
-          // if (contentBoxSize) {
-          //   h1Elem.style.fontSize = `${Math.max(1.5, contentBoxSize.inlineSize / 200)}rem`;
-          //   pElem.style.fontSize = `${Math.max(1, contentBoxSize.inlineSize / 600)}rem`;
-          // } else {
-          //   h1Elem.style.fontSize = `${Math.max(1.5, entry.contentRect.width / 200)}rem`;
-          //   pElem.style.fontSize = `${Math.max(1, entry.contentRect.width / 600)}rem`;
-          // }
         }
       }
 
@@ -360,14 +303,9 @@ export class VideoComponent {
   videoLoaded(event: Event) {
     const videoEl = this.video()?.nativeElement;
 
-    console.log('video loaded event', event);
-
     if (videoEl) {
-      console.log('video loaded', videoEl.videoWidth, videoEl.videoHeight);
       setTimeout(() => {
         const rect = this.el.nativeElement.getBoundingClientRect();
-        console.log('rect', rect);
-        console.log(Math.round(rect.width / this.scale()), Math.round(rect.height / this.scale()));
         this.height.set(Math.round(rect.height / this.scale()));
         this.width.set(Math.round(rect.width / this.scale()));
       }, 1000);
@@ -484,6 +422,7 @@ export class VideoComponent {
         }
       }
 
+      // Why is this not working?
       //await bodySegmentation.drawMask(canvas, video, imageData, 1);
 
       context.putImageData(imageData, 0, 0);

@@ -6,7 +6,9 @@
     autoplay
   ></video>
 }
-<video
+
+<div
+  #compositionsource
   [style.clipPath]="
     clipType() === 'circle'
       ? 'circle(' + circleProps().r + 'px at ' + circleProps().cx + 'px ' + circleProps().cy + 'px)'
@@ -16,12 +18,31 @@
           }px, ${rectProps().x}px ${rectProps().y + rectProps().height}px)`
         : 'none'
   "
-  [srcObject]="srcObject()"
-  (loadedmetadata)="videoLoaded($event)"
-  #video
-  [attr.width]="width()"
-  autoplay
-></video>
+>
+  <video
+    [srcObject]="srcObject()"
+    (loadedmetadata)="videoLoaded($event)"
+    #video
+    [attr.width]="width()"
+    autoplay
+  ></video>
+
+  @if (videoDO().backgroundType() === 'image') {
+    <img
+      style="position: absolute; top: 0; left: 0; transform-origin: top left"
+      src="/assets/images/ng.png"
+      [style.transform]="`scale(${blurCanvasScale()})`"
+    />
+  }
+
+  <canvas
+    style="position: absolute; top: 0; left: 0; transform-origin: top left"
+    [style.transform]="`scale(${blurCanvasScale()})`"
+    [attr.width]="width()"
+    [attr.height]="height()"
+    #canvas
+  ></canvas>
+</div>
 @let cp = circleProps();
 
 <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%">
@@ -60,20 +81,3 @@
     fill="black"
   />
 </svg>
-
-
-@if(videoDO().backgroundType() === 'image') {
-<img
-  style="position: absolute; top: 0; left: 0; transform-origin: top left"
-  src="/assets/images/ng.png"
-  [style.transform]="`scale(${blurCanvasScale()})`"
-/>
-}
-
-<canvas
-  style="position: absolute; top: 0; left: 0; transform-origin: top left"
-  [style.transform]="`scale(${blurCanvasScale()})`"
-  [attr.width]="width()"
-  [attr.height]="height()"
-  #canvas
-></canvas>
