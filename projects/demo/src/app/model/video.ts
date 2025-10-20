@@ -5,12 +5,22 @@ import { VideoService } from '../service/video.service';
 export class VideoDO {
   id: string = '';
   component?: VideoComponent;
-  stream: MediaStream | undefined;
+
+  blured = signal(false);
+  blurAmount = signal(5);
+  edgeBlurAmount = signal(15);
+  foregroundThreshold = signal(0.5);
+
+  backgroundType = signal<'image' | 'blur' | 'none'>('none');
+
+  public settings: MediaTrackSettings;
+
+  constructor(public stream: MediaStream) {
+    this.settings = stream.getVideoTracks()[0].getSettings();
+  }
 }
 
 export class AudioDO {
-
-
   constructor(public stream: MediaStream) {}
 }
 

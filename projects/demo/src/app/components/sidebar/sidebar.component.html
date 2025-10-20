@@ -34,7 +34,24 @@
         Bring to Front
       </button>
     </div>
+
+    <ed-select [(ngModel)]="selectedVideo.videoDO().backgroundType">
+      <ed-select-option value="none">None</ed-select-option>
+      <ed-select-option value="blur">Blur</ed-select-option>
+      <ed-select-option value="image">Image</ed-select-option>
+    </ed-select>
+
     <input type="checkbox" [(ngModel)]="selectedVideo.showClippedHint" />
+    <input type="range" [min]="0" max="50" [(ngModel)]="selectedVideo.videoDO().blurAmount" />
+    <input type="range" [min]="0" max="50" [(ngModel)]="selectedVideo.videoDO().edgeBlurAmount" />
+    <input
+      type="range"
+      [min]="0"
+      max="1"
+      step="0.01"
+      [(ngModel)]="selectedVideo.videoDO().foregroundThreshold"
+    />
+    Muted
   }
 </div>
 
@@ -60,8 +77,7 @@
   </div>
 }
 
-
-@for(audio of recordingService.audioSources(); track $index) {
+@for (audio of recordingService.audioSources(); track $index) {
   audio
   <app-audio-visualizer [stream]="audio.stream"></app-audio-visualizer>
 }

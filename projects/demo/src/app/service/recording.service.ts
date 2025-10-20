@@ -18,20 +18,20 @@ export class RecordingService {
   constructor() {}
 
   async getDesktopStream() {
-    const video = new VideoDO();
-    video.id = `video-${this.videoCount++}`;
-
     const screenShareStream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
     });
+
+    const video = new VideoDO(screenShareStream);
+    video.id = `video-${this.videoCount++}`;
 
     screenShareStream.getVideoTracks().forEach((track) => {
       console.log('track', track.getSettings());
       track.onended = () => {
         console.log('track ended');
-        video.stream = undefined;
       };
     });
+
     video.stream = screenShareStream;
     this.videos.update((prev) => [...prev, video]);
   }
@@ -41,9 +41,13 @@ export class RecordingService {
       video: true,
       audio: false,
     });
-    const video = new VideoDO();
+    const video = new VideoDO(webcamStream);
+
+    webcamStream.getVideoTracks().forEach((track) => {
+      console.log('webcam track', track.getSettings());
+    });
+
     video.id = `video-${this.videoCount++}`;
-    video.stream = webcamStream;
     this.videos.update((prev) => [...prev, video]);
   }
 
@@ -58,12 +62,8 @@ export class RecordingService {
     });
 
     const audioDO = new AudioDO(this.audioStream);
-    
 
-    this.audioSources.update((prev) => [
-      ...prev,
-      audioDO,
-    ]);
+    this.audioSources.update((prev) => [...prev, audioDO]);
   }
 
   startRecording() {

@@ -61,6 +61,19 @@
   />
 </svg>
 
-<!-- <svg style="position: absolute; top: 0; left: 0; width: 240px; height: 240px">
-    <circle #circle [attr.cx]="cp.cx" [attr.cy]="cp.cy" [attr.r]="cp.r" stroke="black" stroke-width="3" fill="rgba(255, 0, 0, 0.5)" />
-</svg> -->
+
+@if(videoDO().backgroundType() === 'image') {
+<img
+  style="position: absolute; top: 0; left: 0; transform-origin: top left"
+  src="/assets/images/ng.png"
+  [style.transform]="`scale(${blurCanvasScale()})`"
+/>
+}
+
+<canvas
+  style="position: absolute; top: 0; left: 0; transform-origin: top left"
+  [style.transform]="`scale(${blurCanvasScale()})`"
+  [attr.width]="width()"
+  [attr.height]="height()"
+  #canvas
+></canvas>
