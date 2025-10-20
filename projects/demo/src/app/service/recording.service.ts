@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { Recording, VideoDO } from '../model/video';
+import { AudioDO, Recording, VideoDO } from '../model/video';
 import { CanvasComponent } from '../components/canvas/canvas.component';
 import { VideoService } from './video.service';
 
@@ -11,6 +11,7 @@ export class RecordingService {
   isRecording = signal(false);
   recordings = signal<Recording[]>([]);
   videos = signal<VideoDO[]>([]);
+  audioSources = signal<AudioDO[]>([]);
   audioStream: MediaStream | null = null;
   canvasComponent: CanvasComponent | undefined = undefined;
   videoCount = 0;
@@ -55,6 +56,14 @@ export class RecordingService {
         autoGainControl: true,
       },
     });
+
+    const audioDO = new AudioDO(this.audioStream);
+    
+
+    this.audioSources.update((prev) => [
+      ...prev,
+      audioDO,
+    ]);
   }
 
   startRecording() {

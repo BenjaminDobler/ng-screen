@@ -8,6 +8,12 @@ export class VideoDO {
   stream: MediaStream | undefined;
 }
 
+export class AudioDO {
+
+
+  constructor(public stream: MediaStream) {}
+}
+
 export class Recording {
   chunks: Blob[] = [];
   name?: string;

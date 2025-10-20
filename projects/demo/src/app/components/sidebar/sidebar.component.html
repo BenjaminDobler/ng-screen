@@ -59,3 +59,9 @@
     } -->
   </div>
 }
+
+
+@for(audio of recordingService.audioSources(); track $index) {
+  audio
+  <app-audio-visualizer [stream]="audio.stream"></app-audio-visualizer>
+}

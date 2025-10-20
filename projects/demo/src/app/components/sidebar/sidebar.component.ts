@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { RecordingService } from '../../service/recording.service';
 import { EditorService } from '../../service/editor.service';
 import { ColorComponent, EdSelectComponent, EdSelectOptionComponent, InputComponent } from '@richapps/ui-components';
+import { AudioVisualizerComponent } from '../audio-visualizer/audio-visualizer.component';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [FormsModule, InputComponent, ColorComponent, EdSelectComponent, EdSelectOptionComponent],
+  imports: [FormsModule, InputComponent, ColorComponent, EdSelectComponent, EdSelectOptionComponent, AudioVisualizerComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
 })
