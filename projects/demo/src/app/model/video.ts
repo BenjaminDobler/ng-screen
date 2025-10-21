@@ -15,13 +15,14 @@ export class VideoDO {
 
   public settings: MediaTrackSettings;
 
-  constructor(public stream: MediaStream) {
+  constructor(public stream: MediaStream, public device: MediaDeviceInfo | undefined, public type: 'webcam' | 'screen') {
     this.settings = stream.getVideoTracks()[0].getSettings();
   }
 }
 
 export class AudioDO {
-  constructor(public stream: MediaStream) {}
+
+  constructor(public stream: MediaStream, public device: MediaDeviceInfo) {}
 }
 
 export class Recording {

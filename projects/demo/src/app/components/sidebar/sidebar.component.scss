@@ -13,3 +13,19 @@
     min-width: 50px;
   }
 }
+
+
+
+.audio-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  label {
+    flex-shrink: 1;
+    white-space: nowrap;
+  }
+
+  &.selected {
+    background: #333;
+  }
+}

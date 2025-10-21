@@ -2,6 +2,9 @@ import { inject, Injectable, signal } from '@angular/core';
 import { AudioDO, Recording, VideoDO } from '../model/video';
 import { CanvasComponent } from '../components/canvas/canvas.component';
 import { VideoService } from './video.service';
+import { Dialog } from '@angular/cdk/dialog';
+import { DeviceChooserComponent } from '../components/device-chooser/device-chooser.component';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class RecordingService {
@@ -15,6 +18,9 @@ export class RecordingService {
   audioStream: MediaStream | null = null;
   canvasComponent: CanvasComponent | undefined = undefined;
   videoCount = 0;
+
+  dialog = inject(Dialog);
+
   constructor() {}
 
   async getDesktopStream() {
@@ -22,7 +28,7 @@ export class RecordingService {
       video: true,
     });
 
-    const video = new VideoDO(screenShareStream);
+    const video = new VideoDO(screenShareStream, undefined, 'screen');
     video.id = `video-${this.videoCount++}`;
 
     screenShareStream.getVideoTracks().forEach((track) => {
@@ -37,11 +43,15 @@ export class RecordingService {
   }
 
   async getWebcamDevices() {
+    const selectedDevice = await this.openDeviceChoiceDialog('videoinput');
+
     const webcamStream = await navigator.mediaDevices.getUserMedia({
-      video: true,
       audio: false,
+      video: {
+        deviceId: selectedDevice.deviceId ? { exact: selectedDevice.deviceId } : undefined,
+      },
     });
-    const video = new VideoDO(webcamStream);
+    const video = new VideoDO(webcamStream, selectedDevice, 'webcam');
 
     webcamStream.getVideoTracks().forEach((track) => {
       console.log('webcam track', track.getSettings());
@@ -51,17 +61,32 @@ export class RecordingService {
     this.videos.update((prev) => [...prev, video]);
   }
 
+  async openDeviceChoiceDialog(type: 'audioinput' | 'videoinput'): Promise<MediaDeviceInfo> {
+    const dialogRef = this.dialog.open(DeviceChooserComponent, {
+      height: ' 250px',
+      width: '300px',
+      panelClass: 'editor-dialog',
+      data: type,
+    });
+
+    const result: any = await firstValueFrom(dialogRef.closed);
+    return result.data as MediaDeviceInfo;
+  }
+
   async getAudioStream() {
-    this.audioStream = await navigator.mediaDevices.getUserMedia({
-      video: false,
+    const selectedDevice = await this.openDeviceChoiceDialog('audioinput');
+
+    const audioStream = await navigator.mediaDevices.getUserMedia({
       audio: {
+        deviceId: selectedDevice.deviceId ? { exact: selectedDevice.deviceId } : undefined,
         echoCancellation: true,
         noiseSuppression: true,
         autoGainControl: true,
       },
+      video: false,
     });
 
-    const audioDO = new AudioDO(this.audioStream);
+    const audioDO = new AudioDO(audioStream, selectedDevice);
 
     this.audioSources.update((prev) => [...prev, audioDO]);
   }

@@ -1,0 +1,5 @@
+@for (device of devices(); track $index) {
+  <div class="item" (click)="selectDevice(device)" >
+    {{ device.label || 'Unnamed Device' }}
+  </div>
+}

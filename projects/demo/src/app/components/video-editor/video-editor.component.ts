@@ -20,8 +20,6 @@ export class VideoEditorComponent {
 
   constructor() {
     afterNextRender(() => {
-      console.log('video player', this.videoPlayer());
-      console.log('dialog data', this.data);
       this.videoElement = this.videoPlayer()?.nativeElement;
       this.videoElement!.src = this.data.getRecordingUrl();
     }); 
