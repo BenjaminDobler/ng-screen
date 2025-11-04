@@ -1,10 +1,34 @@
 :host {
   display: block;
+  width: 100%;
+  height: 100%;
+
+  background: #1e1e1e;
+  box-shadow:
+    0px 10px 16px rgba(0, 0, 0, 0.35),
+    0px 2px 5px rgba(0, 0, 0, 0.35),
+    inset 0px 0.5px 0px rgba(255, 255, 255, 0.08),
+    inset 0px 0px 0.5px rgba(255, 255, 255, 0.35);
+  padding: 0.5rem;
+  border-radius: 0.8125rem;
+
+  display: block;
   background: #222;
   width: 100%;
   height: 100%;
+  --timeline-height: 30px;
 }
 
+.properties-panel_row {
+  display: flex;
+  margin-bottom: 5px;
+  align-items: center;
+  gap: 5px;
+  label {
+    white-space: nowrap;
+    min-width: 105px;
+  }
+}
 
 video {
   width: 100%;
@@ -13,7 +37,7 @@ video {
 
 .timeline {
   position: relative;
-  height: 50px;
+  height: var(--timeline-height);
   background: #333;
   margin-top: 10px;
 }
@@ -24,10 +48,21 @@ video {
   height: 100%;
   background: #666;
   cursor: ew-resize;
+  opacity: 0.001;
 }
 .thumb.start {
   left: 0;
 }
 .thumb.end {
   right: 0;
+}
+
+.clip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: var(--timeline-height);
+  background: var(--highlight-color);
+  border-radius: 10px;
+  pointer-events: none;
 }

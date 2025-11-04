@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import { ConvertedVideo, ExportSettingsDO } from '../model/video';
 
 @Injectable({
   providedIn: 'root',
@@ -8,13 +9,17 @@ import { fetchFile, toBlobURL } from '@ffmpeg/util';
 export class VideoService {
   ffmpeg?: FFmpeg;
 
+  currentConversion: ConvertedVideo | null = null;
+
   constructor() {}
 
   async loadFFmpeg() {
     this.ffmpeg = new FFmpeg();
     this.ffmpeg.on('progress', (e) => {
       console.log(`ffmpeg progress`, e.progress);
-      
+      if (this.currentConversion) {
+        this.currentConversion.progress.set(e.progress);
+      }
     });
     this.ffmpeg.on('log', ({ message }) => {
       console.log('ffmpeg message', message);
@@ -36,9 +41,7 @@ export class VideoService {
     };
   }
 
-
   // "-ss $startTime -t $endTime -i $input -f segment -c copy $output"
-
 
   async trimVideo(recordedBlobs: Blob[], startTime: number, endTime: number) {
     if (!this.ffmpeg) {
@@ -53,7 +56,7 @@ export class VideoService {
     await this.ffmpeg.exec([
       '-i',
       name, // Input file
-        '-ss',
+      '-ss',
       startTime.toString(),
       '-t',
       (endTime - startTime).toString(),
@@ -75,40 +78,16 @@ export class VideoService {
     // );
   }
 
-  async convert(recordedBlobs: Blob[]) {
-    if (!this.ffmpeg) {
-      console.error('ffmpeg not loaded');
-      return;
-    }
+  async convert(recordedBlobs: Blob[], settings: ExportSettingsDO) {
+    const conversion = new ConvertedVideo();
+    conversion.state.set('processing');
+    this.currentConversion = conversion;
 
-    const blob = new Blob(recordedBlobs, { type: 'video/webm' });
-    const name = 'input.webm';
-    await this.ffmpeg.writeFile(name, await fetchFile(blob));
+    this.doConversion(conversion, recordedBlobs, settings);
 
-    await this.ffmpeg.exec([
-      '-i',
-      name, // Input file
-      '-t',
-      '60', // Limit the output duration to 60 seconds
-      '-c:v',
-      'libx264', // Video codec: H.264
-      '-preset',
-      'ultrafast', // Preset for faster encoding
-      '-r',
-      '20', // Frame rate: Reduced to 20 FPS
-      '-s',
-      '480x360', // Reduced resolution
-      '-crf',
-      '28', // Slightly reduced quality for speed
-      'output.mp4', // Output file
-    ]);
+    return conversion;
 
-    console.log('conversion done');
-
-    const data = await this.ffmpeg.readFile('output.mp4');
-    return data;
-
-    // const endTime = performance.now();
+    // const endTime = performance.now();^
     // const diffTime = ((endTime - startTime) / 1000).toFixed(2);
     // this.conversionTime.next(` ${diffTime} s`);
 
@@ -116,5 +95,42 @@ export class VideoService {
     // this.convertedVideoSrc.next(
     //   URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' })),
     // );
+  }
+
+  async doConversion(conversion: ConvertedVideo, recordedBlobs: Blob[], settings: ExportSettingsDO) {
+    const blob = new Blob(recordedBlobs, { type: 'video/webm' });
+    const name = 'input.webm';
+    if (!this.ffmpeg) {
+      console.error('ffmpeg not loaded');
+      return;
+    }
+    await this.ffmpeg.writeFile(name, await fetchFile(blob));
+
+    await this.ffmpeg.exec([
+      '-i',
+      name, // Input file
+      '-ss',
+      settings.startTime!.toString(), // Start time
+      '-t',
+      (settings.endTime! - settings.startTime!).toString(), // Limit the output duration to the selected range
+      '-c:v',
+      'libx264', // Video codec: H.264
+      '-preset',
+      settings.preset, // Preset for faster encoding
+      '-r',
+      settings.frameRate.toString(), // Frame rate: Reduced to 20 FPS
+      '-s',
+      `${settings.resolutionWidth}x${settings.resolutionHeight}`, // Reduced resolution
+      '-crf',
+      settings.crf.toString(), // Slightly reduced quality for speed
+      'output.mp4', // Output file
+    ]);
+
+    console.log('conversion done');
+
+    const data = await this.ffmpeg.readFile('output.mp4');
+    conversion.file.set(data);
+    conversion.state.set('done');
+    this.currentConversion = null;
   }
 }

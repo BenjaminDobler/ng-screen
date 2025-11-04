@@ -82,25 +82,28 @@
   }
 </div>
 
-<!-- <a download="recording.webm" [href]="downloadData">Download recording</a> -->
 
 @for (recording of recordingService.recordings(); track $index) {
   <div>
     {{ recording.name }}
 
-    <button (click)="recording.convertRecording()">Convert</button>
-
     <button (click)="recording.download()">Download</button>
     <button (click)="editorService.open(recording)">Edit</button>
 
-    <!-- <button (click)="playRecording(recording)">Play</button>
-    <button (click)="convertRecording(recording)">Convert</button>
-    @if (recording.convertedData) {
-      <button (click)="playConvertedRecording(recording)">Play Converted</button>
-      <a download="{{ recording.name }}.mp4" [href]="getConvertedUrl(recording)"
-        >Download Converted</a
-      >
-    } -->
+    <div>
+      @for (converted of recording.convertedVideos(); track $index) {
+        <div>
+          @if (converted.state() === 'processing') {
+            Converting...
+          } @else if (converted.state() === 'error') {
+            Error during conversion.
+          } @else if (converted.state() === 'done') {
+            <button (click)="recording.downloadConverted(converted)">Download</button>
+          }
+          {{ converted.progress() }}%
+        </div>
+      }
+    </div>
   </div>
 }
 
@@ -148,7 +151,7 @@
   @for (audio of recordingService.audioSources(); track $index) {
     <div class="audio-item">
       <svg
-        style="flex-shrink: 0;"
+        style="flex-shrink: 0"
         width="16px"
         height="16px"
         viewBox="0 0 24 24"

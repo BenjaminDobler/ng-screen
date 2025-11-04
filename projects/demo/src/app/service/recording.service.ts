@@ -1,10 +1,12 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { AudioDO, Recording, VideoDO } from '../model/video';
+import { AudioDO, ExportSettingsDO, Recording, VideoDO } from '../model/video';
 import { CanvasComponent } from '../components/canvas/canvas.component';
 import { VideoService } from './video.service';
 import { Dialog } from '@angular/cdk/dialog';
 import { DeviceChooserComponent } from '../components/device-chooser/device-chooser.component';
 import { firstValueFrom } from 'rxjs';
+import { ExportSettings } from '../components/export-settings/export-settings';
+import { VideoEditorComponent } from '../components/video-editor/video-editor.component';
 
 @Injectable({ providedIn: 'root' })
 export class RecordingService {
@@ -163,5 +165,17 @@ export class RecordingService {
     //   }
     //   return [...prev];
     // });
+  }
+
+  openExportSettings(recording: Recording) {
+    const dialogRef = this.dialog.open(VideoEditorComponent, {
+      data: recording,
+    });
+
+    dialogRef.closed.subscribe((result: any) => {
+      
+      console.log('export settings closed', result);
+      recording.convertRecording(result.data as ExportSettingsDO);
+    });
   }
 }

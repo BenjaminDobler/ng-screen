@@ -1,44 +1,8 @@
-<video #videoPlayer controls (loadedmetadata)="onVideoLoaded($event)"></video>
-
-<div #timeline class="timeline">
-  <div
-    class="clip"
-    [style.width.px]="end() - start() + 10"
-    [style.transform]="'translateX(' + start() + 'px)'"
-  ></div>
-  <div
-    [draggable]
-    [resizable]="false"
-    [minY]="0"
-    [maxY]="0"
-    [minX]="0"
-    [maxX]="timelineWidth() - 10"
-    class="thumb start"
-    (dragStart)="dragStart()"
-    (positionUpdated)="leftDragUpdated($event)"
-  ></div>
-  <div
-    [draggable]
-    [resizable]="false"
-    [minY]="0"
-    [maxY]="0"
-    [minX]="0"
-    [maxX]="timelineWidth() - 10"
-    class="thumb end"
-    (dragStart)="dragStart()"
-    (positionUpdated)="rightDragUpdated($event)"
-  ></div>
-</div>
-
-{{ startTime() }}
--
-{{ endTime() }}
-
-<div class="properties-panel_row">
+<div>
   <label>Video Quality (CRF)</label>
   <input-component type="number" [(ngModel)]="crf"></input-component>
 </div>
-<div class="properties-panel_row">
+<div>
   <label>Preset</label>
   <ed-select [(ngModel)]="preset">
     <ed-select-option value="ultrafast">Ultrafast</ed-select-option>
@@ -53,14 +17,15 @@
   </ed-select>
 </div>
 
-<div class="properties-panel_row">
+<div>
   <label>Frame Rate</label>
   <input-component type="number" [(ngModel)]="frameRate"></input-component>
 </div>
 
-<div class="properties-panel_row">
+<div>
   <label>Resolution</label>
   <input-component prefix="W" type="number" [(ngModel)]="resolutionWidth"></input-component>
+
   <input-component prefix="H" type="number" [(ngModel)]="resolutionHeight"></input-component>
 </div>
 
